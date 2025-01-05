@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Playlist to Rave.dj</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="tab-container">
+    <!-- Tab 1: Gather Links -->
+    <div class="tab" id="gatherLinksTab">
+      <h2>Gather Playlist Links</h2>
+      <button id="gatherLinksBtn">Gather Links</button>
+      <div id="linksDisplay"></div>
+      <button id="passToRaveDJBtn">Pass to Rave.dj</button>
+      <button id="copyLinksBtn">Copy Links</button>
+      <div id="progressDisplay" style="margin-top: 10px; font-weight: bold; color: #333;">
+        <!-- Progress will appear here -->
+      </div>
+      
+
+    </div>
+
+    <!-- Tab 2: Manual Input -->
+    <div class="tab" id="manualInputTab">
+      <h2>Manual Input</h2>
+      <textarea id="manualLinksInput" placeholder="Paste your array of links here..."></textarea>
+      <button id="submitManuallyBtn">Submit Links to Rave.dj</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
