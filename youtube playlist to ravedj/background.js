@@ -35,6 +35,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 
+
+
+
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Background script is installed and running.");
 });

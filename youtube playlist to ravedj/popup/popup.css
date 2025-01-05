@@ -3,7 +3,7 @@ body {
     margin: 0;
     padding: 10px;
     width: 300px;  /* Adjust width for your popup */
-    height: 400px; /* Adjust height for your popup */
+    height: 600px; /* Adjust height for your popup */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -45,6 +45,10 @@ body {
     padding: 8px;
     margin-top: 10px;
     width: 100%;
+    outline: auto;
+    outline-color: darkgray;
+    border-bottom: thick;
+    border-radius: 15px;
   }
   
   input[type="text"] {
@@ -98,3 +102,23 @@ body {
     display: block;
   }
   
+  #gatheredLinksData,#manualInputData{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: space-around;
+  align-items: stretch;
+  }
+
+  div#gatheredLinksData > button,div#manualInputData > button {
+    outline: auto;
+    outline-color: darkgray;
+    border-bottom: thick;
+    border-radius: 15px;
+}
+
+textarea{
+  width: 100%;
+  height: 100px;
+}

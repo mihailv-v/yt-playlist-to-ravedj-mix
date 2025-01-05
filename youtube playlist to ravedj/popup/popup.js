@@ -13,8 +13,12 @@ function extractAndCombineLinks(input) {
 
   // Remove duplicates and return a unique array
   const uniqueLinks = [...new Set(matches)];
-  return uniqueLinks;
+  document.getElementById('linksDisplayC').textContent = uniqueLinks.length + " Unique Links and " + matches.length + " Total";
+
+    return uniqueLinks;
 }
+
+
 
 document.getElementById('gatherLinksBtn').addEventListener('click', () => {
   // Send a message to background.js to gather links
@@ -24,6 +28,7 @@ document.getElementById('gatherLinksBtn').addEventListener('click', () => {
     if (response && response.links) {
       linksDisplay.textContent = JSON.stringify(response.links, null, 2);
       gatheredLinks=linksDisplay.textContent;
+      extractAndCombineLinks(linksDisplay.textContent)
     } else if (response && response.error) {
       linksDisplay.textContent = response.error;
       console.error('Error: ', response.error);
@@ -196,3 +201,78 @@ function handleContentScriptResponse(response) {
 
 
 
+// Function to store data in chrome.storage
+function saveState() {
+  const linksDisplay = document.getElementById('linksDisplay').value;
+  const manualLinksInput = document.getElementById('manualLinksInput').value;
+
+  chrome.storage.local.set({
+    linksDisplay: linksDisplay,
+    manualLinksInput: manualLinksInput
+  });
+}
+
+// Function to restore data from chrome.storage
+function restoreState() {
+  chrome.storage.local.get(['linksDisplay', 'manualLinksInput'], (result) => {
+    if (result.linksDisplay) {
+      document.getElementById('linksDisplay').value = result.linksDisplay;
+    }
+    if (result.manualLinksInput) {
+      document.getElementById('manualLinksInput').value = result.manualLinksInput;
+    }
+  });
+}
+
+// Debounce function to delay the saveState call to prevent too many writes
+function debounce(fn, delay) {
+  let timeout;
+  return function () {
+    clearTimeout(timeout);
+    timeout = setTimeout(fn, delay);
+  };
+}
+
+// Optional: Button actions like 'Gather Links', 'Pass to Rave.dj', etc. (same as before)
+document.getElementById('gatherLinksBtn').addEventListener('click', () => {
+  console.log("Gathering links...");
+});
+
+document.getElementById('passToRaveDJBtn').addEventListener('click', () => {
+  console.log("Passing links to Rave.dj...");
+});
+
+// Add event listeners for input changes (to handle dynamically updated content)
+document.getElementById('linksDisplay').addEventListener('input', debounce(saveState, 500));  // 500ms delay
+document.getElementById('manualLinksInput').addEventListener('input', debounce(saveState, 500));  // 500ms delay
+// Add event listeners for input changes (to handle dynamically updated content)
+document.getElementById('linksDisplay').addEventListener('change', debounce(saveState, 500));  // 500ms delay
+document.getElementById('manualLinksInput').addEventListener('change', debounce(saveState, 500));  // 500ms delay
+
+// Load the state when the popup is opened
+document.addEventListener('DOMContentLoaded', restoreState);
+
+
+
+// Button event listeners to restore and clear data
+document.getElementById('clearLinksBtn').addEventListener('click', () => {
+  document.getElementById('linksDisplay').value = "";
+  saveState();  // Ensure state is saved after clearing
+});
+
+document.getElementById('restoreLinksBtn').addEventListener('click', restoreState);
+
+document.getElementById('saveLinksBtn').addEventListener('click', () => {
+  saveState();
+});
+
+document.getElementById('clearManualInputBtn').addEventListener('click', () => {
+  document.getElementById('manualLinksInput').value = "";
+  saveState();  // Ensure state is saved after clearing
+});
+
+document.getElementById('restoreManualInputBtn').addEventListener('click', restoreState);
+
+document.getElementById('saveManualInputBtn').addEventListener('click', () => {
+  saveState();
+});

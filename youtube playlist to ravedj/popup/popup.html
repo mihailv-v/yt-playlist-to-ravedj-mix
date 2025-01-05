@@ -11,15 +11,22 @@
     <!-- Tab 1: Gather Links -->
     <div class="tab" id="gatherLinksTab">
       <h2>Gather Playlist Links</h2>
+      
       <button id="gatherLinksBtn">Gather Links</button>
-      <div id="linksDisplay"></div>
+      <br>
+      <br>
+      <textarea id="linksDisplay" contenteditable="true" ></textarea> <!-- Make this editable for user input -->
+      <div id="linksDisplayC">  </div>
       <button id="passToRaveDJBtn">Pass to Rave.dj</button>
       <button id="copyLinksBtn">Copy Links</button>
       <div id="progressDisplay" style="margin-top: 10px; font-weight: bold; color: #333;">
         <!-- Progress will appear here -->
       </div>
-      
-
+      <div id="gatheredLinksData">
+      <button id="clearLinksBtn">Clear Links</button> <!-- Clear links button -->
+      <button id="restoreLinksBtn">Restore Links</button> <!-- Restore links button -->
+      <button id="saveLinksBtn">Save Links</button> <!-- Save links button -->
+      </div>
     </div>
 
     <!-- Tab 2: Manual Input -->
@@ -27,9 +34,15 @@
       <h2>Manual Input</h2>
       <textarea id="manualLinksInput" placeholder="Paste your array of links here..."></textarea>
       <button id="submitManuallyBtn">Submit Links to Rave.dj</button>
+      <div id="manualInputData">
+      <button id="clearManualInputBtn">Clear Manual Input</button> <!-- Clear manual input button -->
+      <button id="restoreManualInputBtn">Restore Manual Input</button> <!-- Restore manual input button -->
+      <button id="saveManualInputBtn">Save Manual Input</button> <!-- Save manual input button -->
+      </div>
     </div>
   </div>
 
   <script src="popup.js"></script>
 </body>
 </html>
+
