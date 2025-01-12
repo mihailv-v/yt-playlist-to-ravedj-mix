@@ -101,6 +101,13 @@ document.getElementById('copyLinksBtn').addEventListener('click', () => {
   });
 });
 
+document.getElementById('copyLinksBtnRave').addEventListener('click', () => {
+  const links = document.getElementById('processed-links-textarea-rave').value;
+  navigator.clipboard.writeText(links).then(() => {
+    alert("Links copied to clipboard!");
+  });
+});
+
 
 document.getElementById('submitManuallyBtn').addEventListener('click', () => {
   const manualInput = document.getElementById('manualLinksInput').value;
@@ -197,6 +204,62 @@ function handleContentScriptResponse(response) {
 
 
 
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'updatePopupWithLinks') {
+    const links = message.links;
+    const count = message.count;
+
+    // Update the textarea with the gathered links (format as array)
+    const formattedLinks = JSON.stringify(links, null, 2);
+    document.getElementById('processed-links-textarea').value = formattedLinks;
+
+    // Update the counter with the number of links gathered
+    document.getElementById('processed-links-counter').innerText = `Links gathered: ${count}`;
+  }
+});
+
+
+
+
+
+
+
+
+
+
+document.getElementById("gatherFromRave").addEventListener("click", () => {
+  chrome.runtime.sendMessage({ type: "gatherRaveData" }, (response) => {
+    if (response.success) {
+      const tracks = response.data;
+      const textarea = document.getElementById("processed-links-textarea-rave");
+      const counter = document.getElementById("processed-links-counter-rave");
+
+      // Update the counter
+      counter.textContent = `Links gathered: ${tracks.length}`;
+
+      // Create a properly formatted array and set it as the textarea value
+      const formattedArray = tracks.map(track => `"${track.youtubeUrl}"`).join(", ");
+      textarea.value = `[${formattedArray}]`;
+    }
+  });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -205,10 +268,12 @@ function handleContentScriptResponse(response) {
 function saveState() {
   const linksDisplay = document.getElementById('linksDisplay').value;
   const manualLinksInput = document.getElementById('manualLinksInput').value;
+  const processedLinksTextareaRave = document.getElementById('processed-links-textarea-rave').value;
 
   chrome.storage.local.set({
     linksDisplay: linksDisplay,
-    manualLinksInput: manualLinksInput
+    manualLinksInput: manualLinksInput,
+    processedLinksTextareaRave: processedLinksTextareaRave
   });
 }
 
@@ -220,6 +285,9 @@ function restoreState() {
     }
     if (result.manualLinksInput) {
       document.getElementById('manualLinksInput').value = result.manualLinksInput;
+    }
+    if (result.processedLinksTextareaRave) {
+      document.getElementById('processed-links-textarea-rave').value = result.manualLinksInput;
     }
   });
 }
@@ -243,11 +311,13 @@ document.getElementById('passToRaveDJBtn').addEventListener('click', () => {
 });
 
 // Add event listeners for input changes (to handle dynamically updated content)
-document.getElementById('linksDisplay').addEventListener('input', debounce(saveState, 500));  // 500ms delay
-document.getElementById('manualLinksInput').addEventListener('input', debounce(saveState, 500));  // 500ms delay
+document.getElementById('linksDisplay').addEventListener('input', debounce(saveState, 3000));  
+document.getElementById('manualLinksInput').addEventListener('input', debounce(saveState, 3000));  
+document.getElementById('processed-links-textarea-rave').addEventListener('input', debounce(saveState, 3000));  
 // Add event listeners for input changes (to handle dynamically updated content)
-document.getElementById('linksDisplay').addEventListener('change', debounce(saveState, 500));  // 500ms delay
-document.getElementById('manualLinksInput').addEventListener('change', debounce(saveState, 500));  // 500ms delay
+document.getElementById('linksDisplay').addEventListener('change', debounce(saveState, 5000));  
+document.getElementById('manualLinksInput').addEventListener('change', debounce(saveState, 5000));  
+document.getElementById('processed-links-textarea-rave').addEventListener('change', debounce(saveState, 5000));  
 
 // Load the state when the popup is opened
 document.addEventListener('DOMContentLoaded', restoreState);
@@ -274,5 +344,16 @@ document.getElementById('clearManualInputBtn').addEventListener('click', () => {
 document.getElementById('restoreManualInputBtn').addEventListener('click', restoreState);
 
 document.getElementById('saveManualInputBtn').addEventListener('click', () => {
+  saveState();
+});
+
+document.getElementById('clearProcessedLinksBtn').addEventListener('click', () => {
+  document.getElementById('processed-links-textarea-rave').value = "";
+  saveState();  // Ensure state is saved after clearing
+});
+
+document.getElementById('restoreProcessedLinksBtn').addEventListener('click', restoreState);
+
+document.getElementById('saveProcessedLinksBtn').addEventListener('click', () => {
   saveState();
 });

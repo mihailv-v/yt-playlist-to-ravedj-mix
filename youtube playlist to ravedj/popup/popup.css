@@ -102,16 +102,16 @@ body {
     display: block;
   }
   
-  #gatheredLinksData,#manualInputData{
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-content: center;
-  justify-content: space-around;
-  align-items: stretch;
+  #gatheredLinksData,#manualInputData,#gatherOnSiteLinks{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: space-around;
+    justify-content: space-around;
+    align-items: stretch;
   }
 
-  div#gatheredLinksData > button,div#manualInputData > button {
+  div#gatheredLinksData > button, div#manualInputData > button, div#gatherOnSiteLinksData > button {
     outline: auto;
     outline-color: darkgray;
     border-bottom: thick;

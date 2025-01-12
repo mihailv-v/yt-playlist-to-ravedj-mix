@@ -4,23 +4,25 @@
   "version": "1.0",
   "description": "A tool to gather YouTube playlist links and input them into rave.dj automatically.",
   "permissions": [
+    "debugger",
     "tabs",
     "activeTab",
     "storage",
     "scripting",
-    "http://*/",
-    "https://*/"
+    "http://*/*",
+    "https://*/*"
   ],
   "host_permissions": [
     "*://*.youtube.com/*",
-    "*://*.rave.dj/*"
+    "*://*.rave.dj/*",
+    "https://rave.dj/mix"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/*","*://*.rave.dj/*"],
+      "matches": ["*://*.youtube.com/*","*://*.rave.dj/*","https://rave.dj/mix"],
       "js": ["content.js"]
     }
   ],

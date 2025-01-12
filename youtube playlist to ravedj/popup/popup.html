@@ -19,6 +19,7 @@
       <div id="linksDisplayC">  </div>
       <button id="passToRaveDJBtn">Pass to Rave.dj</button>
       <button id="copyLinksBtn">Copy Links</button>
+      <hr>
       <div id="progressDisplay" style="margin-top: 10px; font-weight: bold; color: #333;">
         <!-- Progress will appear here -->
       </div>
@@ -34,6 +35,7 @@
       <h2>Manual Input</h2>
       <textarea id="manualLinksInput" placeholder="Paste your array of links here..."></textarea>
       <button id="submitManuallyBtn">Submit Links to Rave.dj</button>
+      <hr>
       <div id="manualInputData">
       <button id="clearManualInputBtn">Clear Manual Input</button> <!-- Clear manual input button -->
       <button id="restoreManualInputBtn">Restore Manual Input</button> <!-- Restore manual input button -->
@@ -41,6 +43,30 @@
       </div>
     </div>
   </div>
+  <hr>
+    <!-- Tab 3: Get content already input into Rave.dj -->
+    <div class="tab-container">
+      <h2>RaveDJ content gather</h2>
+    
+      <div class="tab" id="gatherOnSiteLinks">
+        <h3>Gather On-site Processed Links</h3>
+        <textarea id="processed-links-textarea-rave" rows="10" cols="100"></textarea>
+        <div id="processed-links-counter-rave">Links gathered: 0</div>
+        <div id="gatherOnSiteLinksData">
+          <button id="gatherFromRave">Get Rave.dj Input Data</button>
+          <button id="copyLinksBtnRave">Copy Links</button>
+          <hr>
+          <button id="clearProcessedLinksBtn">Clear Gathered Links</button>
+          <button id="restoreProcessedLinksBtn">Restore Gathered Links</button>
+          <button id="saveProcessedLinksBtn">Save Gathered Links</button>
+        </div>
+      </div>
+    </div>
+
+
+  
+  </div>
+
 
   <script src="popup.js"></script>
 </body>
