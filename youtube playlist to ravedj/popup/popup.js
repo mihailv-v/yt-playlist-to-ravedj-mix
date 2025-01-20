@@ -11,12 +11,34 @@ function extractAndCombineLinks(input) {
     matches.push(match[1]); // Capture the content inside quotes
   }
 
-  // Remove duplicates and return a unique array
-  const uniqueLinks = [...new Set(matches)];
-  document.getElementById('linksDisplayC').textContent = uniqueLinks.length + " Unique Links and " + matches.length + " Total";
+  // Count occurrences of each link
+  const linkCounts = matches.reduce((counts, link) => {
+    counts[link] = (counts[link] || 0) + 1;
+    return counts;
+  }, {});
 
-    return uniqueLinks;
+  // Check the checkbox state
+  const excludeDuplicates = document.getElementById('excludeDuplicatesCheckbox').checked;
+
+  let processedLinks;
+  if (excludeDuplicates) {
+    // Filter out links that appear more than once
+    processedLinks = matches.filter(link => linkCounts[link] === 1);
+  } else {
+    // Remove duplicates and keep unique links
+    processedLinks = [...new Set(matches)];
+  }
+
+  // Calculate duplicate count
+  const duplicatesCount = matches.length - processedLinks.length;
+
+  // Update the display element with detailed statistics
+  document.getElementById('linksDisplayC').textContent =
+    `${processedLinks.length} Links Processed, ${duplicatesCount} Duplicates Excluded, and ${matches.length} Total Links`;
+
+  return processedLinks;
 }
+
 
 
 

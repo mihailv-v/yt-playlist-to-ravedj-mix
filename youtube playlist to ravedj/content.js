@@ -102,7 +102,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 
-
+// Function to create a random delay between 60 and 1600 milliseconds 
+function randomDelay(min = 60, max = 1600) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
 
 
@@ -148,7 +149,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             });
   
             // Delay to allow page processing before the next link
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            await new Promise((resolve) => setTimeout(resolve, randomDelay(50,1500)));
           }
   
           sendResponse({ success: true });

@@ -8,9 +8,7 @@
     "tabs",
     "activeTab",
     "storage",
-    "scripting",
-    "http://*/*",
-    "https://*/*"
+    "scripting"
   ],
   "host_permissions": [
     "*://*.youtube.com/*",

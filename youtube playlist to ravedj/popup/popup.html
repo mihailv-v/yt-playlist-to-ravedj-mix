@@ -8,6 +8,10 @@
 </head>
 <body>
   <div class="tab-container">
+    <button id="saveStateButtonLINKS222">Save Current State of All</button>
+    <button id="restoreStateButtonLINKS222">Restore Previously Saved State</button>
+  </div>
+  <div class="tab-container">
     <!-- Tab 1: Gather Links -->
     <div class="tab" id="gatherLinksTab">
       <h2>Gather Playlist Links</h2>
@@ -37,6 +41,9 @@
       <button id="submitManuallyBtn">Submit Links to Rave.dj</button>
       <hr>
       <div id="manualInputData">
+        <label>
+          <input type="checkbox" id="excludeDuplicatesCheckbox"> Exclude duplicates from being processed
+        </label>
       <button id="clearManualInputBtn">Clear Manual Input</button> <!-- Clear manual input button -->
       <button id="restoreManualInputBtn">Restore Manual Input</button> <!-- Restore manual input button -->
       <button id="saveManualInputBtn">Save Manual Input</button> <!-- Save manual input button -->
@@ -62,6 +69,36 @@
         </div>
       </div>
     </div>
+    <hr>
+    <div class="tab-container">
+      
+
+      <div>
+        <h3>Link Processor</h3>
+    
+        <!-- Input Section -->
+        <textarea id="linksInputLINKS222" placeholder='Enter links here (e.g., ["link1","link2"]["link3","link4"])' rows="10" cols="50"></textarea>
+        <br>
+    
+        <!-- Options -->
+        <input type="checkbox" id="excludeDuplicatesCheckboxLINKS222">
+        <label for="excludeDuplicatesCheckboxLINKS222">Exclude duplicates</label>
+        <br>
+    
+        <input type="checkbox" id="shuffleCheckboxLINKS222">
+        <label for="shuffleCheckboxLINKS222">Shuffle links</label>
+        <br>
+    
+        <!-- Buttons -->
+        <button id="splitLinksButtonLINKS222">Process and Split Links</button>
+    
+        <!-- Output Section -->
+        <div id="splitLinksContainerLINKS222" style="margin-top: 20px;"></div>
+      </div>
+    
+      <!-- Linking to popup.js -->
+      <script src="popup2.js"></script>
+      
 
 
   
@@ -70,5 +107,9 @@
 
   <script src="popup.js"></script>
 </body>
+
+
+
+
 </html>
 
