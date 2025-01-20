@@ -24,49 +24,62 @@ function extractAndCombineLinks(input) {
   return matches;
 }
 
-// Function to split an array into chunks
+// Function to split an array into chunks based on the provided chunk size
 function splitIntoChunks(array, chunkSize) {
-  const chunks = [];
-  for (let i = 0; i < array.length; i += chunkSize) {
-    chunks.push(array.slice(i, i + chunkSize));
+    const chunks = [];
+    for (let i = 0; i < array.length; i += chunkSize) {
+      chunks.push(array.slice(i, i + chunkSize));
+    }
+    return chunks;
   }
-  return chunks;
-}
-
-// Function to create textareas with properly formatted arrays
-function createSplitTextareas(links) {
-  const container = document.getElementById("splitLinksContainerLINKS222");
-  container.innerHTML = ""; // Clear any previous content
-
-  const chunks = splitIntoChunks(links, 500);
-
-  chunks.forEach((chunk, index) => {
-    const formattedChunk = `["${chunk.join('","')}"]`;
-
-    const textarea = document.createElement("textarea");
-    textarea.value = formattedChunk; // Add the formatted chunk to the textarea
-    textarea.rows = 10;
-    textarea.cols = 50;
-    textarea.readOnly = true;
-
-    const copyButton = document.createElement("button");
-    copyButton.textContent = `Copy Chunk ${index + 1}`;
-    copyButton.addEventListener("click", () => {
-      navigator.clipboard.writeText(textarea.value);
-      alert(`Chunk ${index + 1} copied to clipboard!`);
+  
+  // Function to create textareas with properly formatted arrays
+  function createSplitTextareas(links) {
+    const container = document.getElementById("splitLinksContainerLINKS222");
+    const chunkSizeInput = document.getElementById("chunksLINKS222").value;
+    
+    // Default to 500 if no chunk size is provided, and parse as integer
+    let chunkSize = parseInt(chunkSizeInput);
+  
+    // Validate chunkSize to make sure it's a positive integer
+    if (isNaN(chunkSize) || chunkSize <= 0) {
+      chunkSize = 500;  // Fallback to default chunk size if invalid input
+      alert("Invalid chunk size entered. Defaulting to 500.");
+    }
+  
+    container.innerHTML = ""; // Clear any previous content
+  
+    // Split the links into chunks based on the specified chunk size
+    const chunks = splitIntoChunks(links, chunkSize);
+  
+    // Create the chunk elements with textareas
+    chunks.forEach((chunk, index) => {
+      const formattedChunk = `["${chunk.join('","')}"]`;
+  
+      const textarea = document.createElement("textarea");
+      textarea.value = formattedChunk; // Add the formatted chunk to the textarea
+      textarea.rows = 10;
+      textarea.cols = 50;
+      textarea.readOnly = true;
+  
+      const copyButton = document.createElement("button");
+      copyButton.textContent = `Copy Chunk ${index + 1}`;
+      copyButton.addEventListener("click", () => {
+        navigator.clipboard.writeText(textarea.value);
+        alert(`Chunk ${index + 1} copied to clipboard!`);
+      });
+  
+      const containerDiv = document.createElement("div");
+      containerDiv.style.marginBottom = "20px";
+      containerDiv.appendChild(textarea);
+      containerDiv.appendChild(copyButton);
+  
+      container.appendChild(containerDiv);
     });
-
-    const containerDiv = document.createElement("div");
-    containerDiv.style.marginBottom = "20px";
-    containerDiv.appendChild(textarea);
-    containerDiv.appendChild(copyButton);
-
-    container.appendChild(containerDiv);
-  });
 
   // Show stats about the split process
   const stats = document.createElement("p");
-  stats.textContent = `${links.length} links divided into ${chunks.length} chunks (max 500 links per chunk).`;
+  stats.textContent = `${links.length} links divided into ${chunks.length} chunks (max ${chunkSize} links per chunk).`;
   container.insertBefore(stats, container.firstChild);
 }
 
