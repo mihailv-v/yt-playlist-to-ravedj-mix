@@ -3,103 +3,102 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "gatherLinks") {
     console.log("in gatherLinks: Starting link gathering process");
 
-    // Check if the current URL is on `music.youtube`
-    if (window.location.host.includes("music.youtube")) {
-      const newUrl = window.location.href.replace("music.youtube", "www.youtube");
-      console.log(`in gatherLinks: Redirecting to ${newUrl}`);
-      window.location.href = newUrl; // Redirect to the new URL
-      return; // Stop further execution as the redirection will reload the page
+    // Redirect /watch?v=...&list=... to /playlist?list=...
+    const currentUrl = window.location.href;
+    const playlistRegex = /youtube\.com\/watch\?v=([^&]+)&list=([^&]+)/;
+    if (playlistRegex.test(currentUrl)) {
+      const newUrl = currentUrl.replace(playlistRegex, "youtube.com/playlist?list=$2");
+      console.log(`Redirecting to playlist page: ${newUrl}`);
+      window.location.href = newUrl;
+      return; // Stop further execution since the page is reloading
     }
 
-    // Wait for the playlist page to load before starting
     const waitForPlaylistToLoad = () => {
-      if (document.querySelectorAll('a.ytd-playlist-video-renderer').length > 0) {
-        console.log("in gatherLinks: Playlist loaded. Starting link gathering process.");
+      // Remove the recommended section before gathering video links
+      const removeRecommendedSection = () => {
+        const recommendedSection = document.querySelector("ytd-item-section-renderer[page-subtype='playlist'][title-style='ITEM_SECTION_HEADER_TITLE_STYLE_PLAYLIST_RECOMMENDATIONS']");
+        if (recommendedSection) {
+          recommendedSection.remove();
+          console.log("Removed recommended videos section.");
+        }
+      };
 
-        // Main link-gathering logic
-        const videoLinks = new Set(); // To store unique links
-        let previousLinks = new Set(); // To compare against current links
-        let noChangeCounter = 0; // Counter for consecutive unchanged iterations
+      const videos = document.querySelectorAll('a.ytd-playlist-video-renderer');
+      if (videos.length > 0) {
+        console.log("Playlist loaded. Starting link gathering process.");
 
-        // Function to gather video links
+        const videoLinks = new Set();
+        let previousLinks = new Set();
+        let noChangeCounter = 0;
+
+        // Gather video links excluding the recommended section
         const gatherVideoLinks = () => {
-          const videos = document.querySelectorAll('a.ytd-playlist-video-renderer'); // Playlist video elements
-          console.log(`in gatherLinks: Found ${videos.length} video elements`);
-
-          videos.forEach(video => {
-            if (video.href) {
-              const cleanedLink = video.href.split('&')[0];
-              videoLinks.add(cleanedLink);
-              console.log(`in gatherLinks: Added link ${cleanedLink}`);
+          // Select only videos that are part of the playlist, excluding the recommended section
+          document.querySelectorAll('a.ytd-playlist-video-renderer').forEach(video => {
+            // Check if the video is within the playlist section (exclude recommended)
+            if (video.closest('ytd-playlist-video-list-renderer')) {
+              if (video.href) {
+                const cleanedLink = video.href.split('&')[0]; // Clean the URL
+                videoLinks.add(cleanedLink);
+                console.log(`Added link: ${cleanedLink}`);
+              }
             }
           });
-
-          console.log(`in gatherLinks: Current videoLinks size: ${videoLinks.size}`);
         };
 
-        // Function to force scroll the page
         const forceScroll = () => {
-          window.scrollBy(0, 1000); // Scroll down by 1000px
-          console.log("in gatherLinks: Forced scroll down");
-
+          window.scrollBy(0, 1000); // Scroll down
           const continuationsElement = document.querySelector('#continuations');
           if (continuationsElement) {
             continuationsElement.scrollIntoView({ behavior: 'smooth' });
-            console.log("in gatherLinks: Scrolled to #continuations element");
           }
         };
 
-        // Function to check if spinner is visible
         const isSpinnerVisible = () => {
           const spinner = document.querySelector('tp-yt-paper-spinner#spinner');
-          const visible = spinner && spinner.offsetParent !== null; // Checks if the spinner is visible
-          console.log(`in gatherLinks: Spinner visible: ${visible}`);
-          return visible;
+          return spinner && spinner.offsetParent !== null;
         };
 
-        // Interval to manage scrolling and gathering links
         const interval = setInterval(() => {
-          gatherVideoLinks(); // Gather links after scrolling
+          gatherVideoLinks();
+          removeRecommendedSection(); // Ensure the recommendation section is removed
 
-          // Compare current links to previous
-          const currentLinks = Array.from(videoLinks).sort(); // Convert to sorted array for comparison
-          const previousLinksArray = Array.from(previousLinks).sort(); // Previous links as sorted array
+          const currentLinks = Array.from(videoLinks).sort();
+          const previousLinksArray = Array.from(previousLinks).sort();
 
+          // Check if links have changed
           if (
-            currentLinks.length === previousLinksArray.length && // Same number of links
-            currentLinks.every((link, index) => link === previousLinksArray[index]) // Same links
+            currentLinks.length === previousLinksArray.length &&
+            currentLinks.every((link, index) => link === previousLinksArray[index])
           ) {
             noChangeCounter++;
-            console.log(`in gatherLinks: No change detected. Counter: ${noChangeCounter}`);
           } else {
-            noChangeCounter = 0; // Reset counter if there’s a change
-            console.log(`in gatherLinks: Detected change in links. Resetting counter.`);
+            noChangeCounter = 0;
           }
 
-          // Update previousLinks for the next iteration
           previousLinks = new Set(videoLinks);
 
-          // Stop scrolling if no changes for 4 consecutive iterations AND spinner is no longer visible
+          // If no change for several iterations and no spinner, stop
           if (noChangeCounter >= 4 && !isSpinnerVisible()) {
-            clearInterval(interval); // Stop the interval
-            console.log("in gatherLinks: Stopping scrolling process. Gathering final links.");
-            console.log(`in gatherLinks: Final videoLinks size: ${videoLinks.size}`);
-            sendResponse({ links: Array.from(videoLinks) }); // Send unique links back
+            clearInterval(interval);
+            console.log("Stopping scrolling. Final link count:", videoLinks.size);
+            sendResponse({ links: Array.from(videoLinks) });
           } else {
-            forceScroll(); // Force scroll the page
+            forceScroll(); // Continue scrolling to gather more links
           }
-        }, 5000); // Wait 5 seconds between loops
+        }, 5000);
       } else {
-        console.log("in gatherLinks: Waiting for playlist to load...");
-        setTimeout(waitForPlaylistToLoad, 1000); // Retry after 1 second
+        setTimeout(waitForPlaylistToLoad, 1000); // Retry if playlist hasn't loaded yet
       }
     };
 
-    // Start the playlist-loading wait process
     waitForPlaylistToLoad();
   }
-  return true; // Keep the message channel open
+  return true;
 });
+
+
+
 
 
 // Function to create a random delay between 60 and 1600 milliseconds 
@@ -170,6 +169,130 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 
   
+
+
+
+
+
+
+
+  console.log("content.js is running and ready for messages.");
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      console.log("Received message in content.js:", message);
+  
+      if (message.action === "startInput" && message.songs) {
+          console.log("Starting song input...");
+  
+          const waitForElement = (selector, timeout = 15000) => {
+              return new Promise((resolve, reject) => {
+                  const startTime = Date.now();
+                  const check = () => {
+                      const element = document.querySelector(selector);
+                      if (element) resolve(element);
+                      else if (Date.now() - startTime > timeout) reject("Timeout waiting for element: " + selector);
+                      else setTimeout(check, 100);
+                  };
+                  check();
+              });
+          };
+  
+          const getTrackCount = () => document.querySelectorAll(".track").length;
+  
+          waitForElement("input.search-input")
+              .then(async (inputField) => {
+                  for (let i = 0; i < message.songs.length; i++) {
+                      const link = message.songs[i];
+  
+                      console.log(`🎵 Entering link: ${link}`);
+                      inputField.value = link;
+                      inputField.dispatchEvent(new Event("input", { bubbles: true }));
+  
+                      const searchButton = document.querySelector('button > a > svg.icon');
+                      if (searchButton) {
+                          searchButton.closest('button').click();
+                          console.log(`🔍 Clicked search for: ${link}`);
+                      } else {
+                          console.warn("⚠️ Search button not found!");
+                      }
+  
+                      await new Promise((resolve) => setTimeout(resolve, 1000));
+                  }
+  
+                  const checkTracksInterval = setInterval(async () => {
+                      const trackCount = getTrackCount();
+                      console.log("🎶 Current track count:", trackCount);
+  
+                      if (trackCount === 2) {
+                          clearInterval(checkTracksInterval);
+                          console.log("✅ Both songs detected! Waiting 2 seconds before clicking 'Create Mashup'...");
+                          
+                          await new Promise((resolve) => setTimeout(resolve, 2000));
+  
+                          const createButton = document.querySelector(".mix-button.mix-floating-footer");
+                          if (createButton) {
+                              console.log("✅ Create Mashup button found! Attempting click events...");
+  
+                              const clickEvents = [
+                                  { type: "touchstart", delay: 126 },
+                                  { type: "touchend", delay: 3000 },
+                                  { type: "click", delay: 3000 },
+                              ];
+  
+                              for (const event of clickEvents) {
+                                  createButton.dispatchEvent(new MouseEvent(event.type, { bubbles: true }));
+                                  console.log(`🖱️ ${event.type} event performed. Waiting ${event.delay / 1000} seconds to check for mashup creation...`);
+                                  
+                                  await new Promise((resolve) => setTimeout(resolve, event.delay));
+  
+                                  if (checkIfMashupStarted()) {
+                                      console.log("🎉 Mashup has started creating! URL changed and button disappeared.");
+                                      sendResponse({ success: true });
+                                      return;
+                                  }
+                              }
+  
+                              console.warn("❌ Mashup creation did not start despite all click events!");
+                          } else {
+                              console.warn("❌ Create Mashup button not found!");
+                          }
+                      }
+                  }, 1000);
+              })
+              .catch((error) => {
+                  console.error("🚨 Error:", error);
+                  sendResponse({ error: "Input field not found!" });
+              });
+  
+          return true;
+      }
+  });
+  
+  // Function to check if mashup creation has started
+  function checkIfMashupStarted() {
+      const currentURL = window.location.pathname;
+      const createButton = document.querySelector(".mix-button.mix-floating-footer");
+  
+      if (currentURL !== "/mix" || !createButton) {
+          return true; // Mashup started
+      }
+      return false;
+  }
+  
+  
+  
+  
+  
+  
+
+
+
+
+
+
+
+
+
 
 
 

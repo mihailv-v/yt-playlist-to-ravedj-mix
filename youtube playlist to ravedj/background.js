@@ -61,6 +61,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "gatherRaveData") {
     // Forward data to popup.js
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      
       chrome.tabs.sendMessage(tabs[0].id, message, (response) => {
         sendResponse(response);
       });
@@ -73,6 +74,88 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 
 
+
+
+
+
+
+
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "navigateToRave_VAR222" && message.songs) {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (tabs.length === 0) {
+              console.error("No active tab found.");
+              return;
+          }
+
+          const currentTab = tabs[0];
+          const url = new URL(currentTab.url);
+
+          console.log("🌍 Active tab:", currentTab.url);
+
+          if (url.hostname === "rave.dj") {
+              if (url.pathname === "/mix") {
+                  console.log("✅ Already on the mix page. Injecting content script...");
+
+                  chrome.scripting.executeScript({
+                      target: { tabId: currentTab.id },
+                      files: ["content.js"],
+                  }, () => {
+                      console.log("📜 Content script injected. Sending startInput message...");
+                      chrome.tabs.sendMessage(currentTab.id, {
+                          action: "startInput",
+                          songs: message.songs
+                      });
+                  });
+              } else {
+                  console.log("🚀 Detected a mashup page! Opening a new tab for /mix...");
+
+                  chrome.tabs.create({ url: "https://rave.dj/mix" }, (newTab) => {
+                      chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {
+                          if (tabId === newTab.id && changeInfo.status === "complete") {
+                              chrome.tabs.onUpdated.removeListener(listener);
+                              console.log("✅ New mix page loaded, injecting content script...");
+
+                              chrome.scripting.executeScript({
+                                  target: { tabId: newTab.id },
+                                  files: ["content.js"],
+                              }, () => {
+                                  console.log("📜 Content script injected in the new tab. Sending startInput message...");
+                                  chrome.tabs.sendMessage(newTab.id, {
+                                      action: "startInput",
+                                      songs: message.songs
+                                  });
+                              });
+                          }
+                      });
+                  });
+              }
+          } else {
+              console.log("🌍 Not on Rave.dj. Navigating to /mix...");
+              chrome.tabs.update(currentTab.id, { url: "https://rave.dj/mix" }, () => {
+                  chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {
+                      if (tabId === currentTab.id && changeInfo.status === "complete") {
+                          chrome.tabs.onUpdated.removeListener(listener);
+                          console.log("✅ Mix page loaded, injecting content script...");
+
+                          chrome.scripting.executeScript({
+                              target: { tabId: currentTab.id },
+                              files: ["content.js"],
+                          }, () => {
+                              console.log("📜 Content script injected after page load. Sending startInput message...");
+                              chrome.tabs.sendMessage(currentTab.id, {
+                                  action: "startInput",
+                                  songs: message.songs
+                              });
+                          });
+                      }
+                  });
+              });
+          }
+      });
+  }
+});
 
 
 
