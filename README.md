@@ -1,5 +1,6 @@
 # yt-playlist-to-ravedj-mix
-![image](https://github.com/user-attachments/assets/c75bbb8d-51e3-402d-9fbc-094d4a5f7a05)
+![image](https://github.com/user-attachments/assets/268dfdf9-c143-427c-9106-2cf439f6422d)
+
 
 
 
