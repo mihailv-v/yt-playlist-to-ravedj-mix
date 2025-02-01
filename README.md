@@ -5,4 +5,4 @@
 
 
 
-Extension that based on n open playlist on YT gets all the visible links in the list and opens ravedj to input them one by one to be mixed
+Extention that automates processes between ravedj and youtube for easier mashup / mix creation
