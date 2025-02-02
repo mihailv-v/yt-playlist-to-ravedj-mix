@@ -1,3 +1,4 @@
+document.addEventListener('DOMContentLoaded', () => {
 let gatheredLinks;
 function extractAndCombineLinks(input) {
   // Regular expression to find all links surrounded by ' ' or " "
@@ -378,4 +379,14 @@ document.getElementById('restoreProcessedLinksBtn').addEventListener('click', re
 
 document.getElementById('saveProcessedLinksBtn').addEventListener('click', () => {
   saveState();
+});
+
+
+
+
+
+
+
+
+
 });

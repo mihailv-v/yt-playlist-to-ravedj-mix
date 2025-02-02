@@ -1,3 +1,4 @@
+document.addEventListener('DOMContentLoaded', () => {
 // Function to extract links from input text
 // Extracts links from input (handles both single links and arrays)
 function extractLinksFromInput_VAR222(text) {
@@ -169,4 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.removeItem("savedStateLINKS222");
         alert("All data cleared!");
     });
+});
+
+
 });

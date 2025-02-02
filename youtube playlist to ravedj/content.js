@@ -292,6 +292,75 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 
 
+// content.js gather from profile
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "gatherAllVideosFromPage") {
+    console.log("In gatherAllVideosFromPage: Starting video gathering process");
+
+    const waitForPageToLoad = () => {
+      const videos = document.querySelectorAll('ytd-rich-item-renderer');
+      if (videos.length > 0) {
+        console.log("Page loaded. Starting video link gathering.");
+
+        const videoLinks = new Set();
+        let previousLinks = new Set();
+        let noChangeCounter = 0;
+
+        const gatherVideoLinks = () => {
+          document.querySelectorAll('a.ytd-rich-grid-media').forEach(video => {
+            if (video.href) {
+              const cleanedLink = video.href.split('&')[0]; // Clean the URL
+              videoLinks.add(cleanedLink);
+              console.log(`Added link: ${cleanedLink}`);
+            }
+          });
+        };
+
+        const forceScroll = () => {
+          window.scrollBy(0, 1000); // Scroll down
+          const continuationsElement = document.querySelector('#continuations');
+          if (continuationsElement) {
+            continuationsElement.scrollIntoView({ behavior: 'smooth' });
+          }
+        };
+
+        const isSpinnerVisible = () => {
+          const spinner = document.querySelector('tp-yt-paper-spinner#spinner');
+          return spinner && spinner.offsetParent !== null;
+        };
+
+        const interval = setInterval(() => {
+          gatherVideoLinks();
+
+          const currentLinks = Array.from(videoLinks).sort();
+          const previousLinksArray = Array.from(previousLinks).sort();
+
+          if (currentLinks.length === previousLinksArray.length &&
+            currentLinks.every((link, index) => link === previousLinksArray[index])) {
+            noChangeCounter++;
+          } else {
+            noChangeCounter = 0;
+          }
+
+          previousLinks = new Set(videoLinks);
+
+          if (noChangeCounter >= 4 && !isSpinnerVisible()) {
+            clearInterval(interval);
+            console.log("Stopping scroll. Final video link count:", videoLinks.size);
+            sendResponse({ links: Array.from(videoLinks) });
+          } else {
+            forceScroll();
+          }
+        }, 5000);
+      } else {
+        setTimeout(waitForPageToLoad, 1000); // Retry if page hasn't loaded yet
+      }
+    };
+
+    waitForPageToLoad();
+  }
+  return true;
+});
 
 
 

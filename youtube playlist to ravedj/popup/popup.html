@@ -34,6 +34,28 @@
       </div>
     </div>
 
+<!-- Tab 1.2: Gather All Video Links -->
+<div class="tab" id="gatherAllVideosFromPageTab">
+  <h2>Gather Video Links</h2>
+
+  <button id="gatherAllVideosFromPageBtn">Gather Video Links</button>
+  <br>
+  <br>
+  <textarea id="videoLinksDisplay" contenteditable="true"></textarea> <!-- Editable text area for video links -->
+  <div id="videoLinksDisplayC"></div>
+  <button id="copyVideoLinksBtn">Copy Video Links</button>
+  <hr>
+  <div id="progressDisplay" style="margin-top: 10px; font-weight: bold; color: #333;">
+    <!-- Progress will appear here -->
+  </div>
+  <div id="gatheredVideoLinksData">
+    <button id="clearVideoLinksBtn">Clear Links</button> <!-- Clear links button -->
+    <button id="restoreVideoLinksBtn">Restore Links</button> <!-- Restore links button -->
+    <button id="saveVideoLinksBtn">Save Links</button> <!-- Save links button -->
+  </div>
+  <script src="popup4.js" defer></script>
+</div>
+
     <!-- Tab 2: Manual Input -->
     <div class="tab" id="manualInputTab">
       <h2>Manual Input</h2>
@@ -100,7 +122,7 @@
       </div>
     
       <!-- Linking to popup.js -->
-      <script src="popup2.js"></script>
+      <script src="popup2.js" defer></script>
       
 
 
@@ -120,11 +142,11 @@
       <div id="variationsContainerLINKS222"></div>
   </div>
   <!-- Linking to popup.js -->
-  <script src="popup3.js"></script>
+  <script src="popup3.js" defer></script>
     </div>
 
 
-  <script src="popup.js"></script>
+  <script src="popup.js" defer></script>
 </body>
 
 

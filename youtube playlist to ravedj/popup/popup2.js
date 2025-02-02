@@ -1,3 +1,5 @@
+document.addEventListener('DOMContentLoaded', () => {
+
 // Regular expression to find links surrounded by ' ' or " "
 const regex = /["'](.*?)["']/g;
 
@@ -204,3 +206,5 @@ document.getElementById("saveStateButtonLINKS222").addEventListener("click", sav
 
 // Event Listener for Restore State Button
 document.getElementById("restoreStateButtonLINKS222").addEventListener("click", restoreState);
+
+});

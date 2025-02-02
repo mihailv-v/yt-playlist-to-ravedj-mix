@@ -167,6 +167,36 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 
 
+// background.js ather from profile
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log("Message received:", message);
+  if (message.action === "gatherAllVideosFromPage") {
+    console.log("Action is 'gatherAllVideosFromPage'. Querying active tab...");
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const activeTab = tabs[0];
+      if (activeTab && activeTab.id) {
+        console.log("Sending message to content script in active tab:", activeTab.id);
+        chrome.tabs.sendMessage(
+          activeTab.id,
+          { action: "gatherAllVideosFromPage" },
+          (response) => {
+            if (chrome.runtime.lastError) {
+              console.error("Error connecting to content script:", chrome.runtime.lastError.message);
+              sendResponse({ error: "Content script not loaded. Reload the tab and try again." });
+            } else {
+              console.log("Response from content script:", response);
+              sendResponse(response);
+            }
+          }
+        );
+      } else {
+        console.error("No active tab found.");
+        sendResponse({ error: "No active tab found." });
+      }
+    });
+    return true;
+  }
+});
 
 
 
